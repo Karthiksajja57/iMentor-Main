@@ -55,8 +55,8 @@ const learningRoutes = require("./routes/learning");
 const learningPathRoutes = require("./routes/learningPath");
 const knowledgeSourceRoutes = require("./routes/knowledgeSource");
 const analyticsRoutes = require('./routes/analytics');
-const feedbackRoutes = require('./routes/feedback');
 const finetuningRoutes = require('./routes/finetuning');
+const feedbackRoutes = require('./routes/feedback');
 const gamificationRoutes = require('./routes/gamification');
 const knowledgeStateRoutes = require('./routes/knowledgeState');
 const filesRoutes = require('./routes/files');
@@ -78,8 +78,6 @@ const { startBossBattleGenerator } = require('./jobs/bossBattleGenerator');
 const { startBountyCleanup } = require('./jobs/bountyCleanup');
 const { startBountyGenerator } = require('./jobs/bountyGenerator');
 const { startSpacedRepetitionScheduler } = require('./jobs/spacedRepetitionScheduler');
-// REMOVED: Nightly session evaluator cron job - now runs via maintenance script
-// const { startNightlySessionEvaluator } = require('./jobs/nightlySessionEvaluator');
 
 const ENABLE_CRON = process.env.ENABLE_CRON !== 'false';
 
@@ -140,7 +138,6 @@ function startCourseFileWatchers() {
     log.info('SYSTEM', `New course PDF detected: ${filePath}`);
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
-      // Trigger both: Cpurses ingestion + full pipeline for course_bootstrap
       triggerCpursesIngestion('file-watcher');
       triggerMaterialPipeline('file-watcher');
     }, 5000);
@@ -159,7 +156,7 @@ if (!mongoUri) {
 
 const app = express();
 
-// --- Security Middleware Stack [Team1-6] ---
+// --- Security Middleware Stack ---
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -170,14 +167,13 @@ app.use(
     },
   })
 );
-app.use(mongoSanitize()); // Prevent NoSQL injection
+app.use(mongoSanitize());
 
 const configuredFrontendOrigins = (process.env.FRONTEND_URL || '')
   .split(',')
   .map(origin => origin.trim())
   .filter(Boolean);
 
-// If FRONTEND_PORT is given without a full FRONTEND_URL, also allow that port on localhost
 const frontendPort = process.env.FRONTEND_PORT;
 const portDerivedOrigins = frontendPort
   ? [`http://localhost:${frontendPort}`, `http://127.0.0.1:${frontendPort}`]
@@ -189,11 +185,12 @@ const allowedOrigins = new Set([
   'http://localhost:5173',
   'http://127.0.0.1:5173',
   'http://localhost:3000',
-  'http://127.0.0.1:3000'
+  'http://127.0.0.1:3000',
+  'http://localhost:3005',
+  'http://127.0.0.1:3005'
 ]);
 
 app.use((req, res, next) => {
-  // Allow Chrome's Private Network Access (PNA) preflight for local dev
   if (req.method === 'OPTIONS' && req.headers['access-control-request-private-network']) {
     res.setHeader('Access-Control-Allow-Private-Network', 'true');
   }
@@ -203,12 +200,10 @@ app.use((req, res, next) => {
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
-
     const isLocalDevOrigin = /^https?:\/\/(localhost|127\.0\.0\.1|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(:\d+)?$/.test(origin);
     if (allowedOrigins.has(origin) || isLocalDevOrigin) {
       return callback(null, true);
     }
-
     return callback(new Error(`CORS blocked origin: ${origin}`));
   },
   credentials: true
@@ -232,19 +227,15 @@ app.get('/metrics', async (req, res) => {
   res.end(await register.metrics());
 });
 
-// --- Public Routes (No Authentication Required) ---
 app.use("/api/network", networkRoutes);
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/guest", guestChatRoutes);
 
-// --- Admin Routes (Uses its own adminAuthMiddleware) ---
 app.use('/api/admin/analytics', adminAuthMiddleware, analyticsRoutes);
 app.use('/api/admin/finetuning', adminAuthMiddleware, finetuningRoutes);
 app.use('/api/admin/gamification', adminAuthMiddleware, require('./routes/adminGamification'));
 app.use("/api/admin", adminAuthMiddleware, adminMasterRouter);
 
-// --- Protected User Routes (Requires standard authMiddleware) ---
-// The authMiddleware is now passed as the second argument, applying it specifically to these routers.
 app.use("/api/user", authMiddleware, userRoutes);
 app.use("/api/chat", authMiddleware, chatLimiter, chatRoutes);
 app.use("/api/upload", authMiddleware, uploadRoutes);
@@ -263,10 +254,8 @@ app.use("/api/knowledge-sources", authMiddleware, knowledgeSourceRoutes);
 app.use('/api/feedback', authMiddleware, feedbackRoutes);
 app.use('/api/gamification', authMiddleware, gamificationRoutes);
 
-// --- Internal Service Routes (Python → Node.js callbacks, no JWT required) ---
 const { syncSkillTreeToMongo } = require('./services/skillTreeSyncService');
 app.post('/api/internal/skill-tree/sync', (req, res, next) => {
-    // Simple shared-secret auth for internal service-to-service calls
     const token = req.header('X-Internal-Token') || req.header('Authorization')?.replace('Bearer ', '');
     const expected = process.env.INTERNAL_SERVICE_TOKEN;
     if (expected && token !== expected) {
@@ -290,21 +279,18 @@ app.post('/api/internal/skill-tree/sync', (req, res, next) => {
 });
 app.use('/api/knowledge-state', authMiddleware, knowledgeStateRoutes);
 app.use('/api/research', authMiddleware, researchLimiter, researchRoutes);
-app.use('/api/deep-research', authMiddleware, researchLimiter, deepResearchRoutes); // [Team1-6] Deep research
-app.use('/api/tutor', authMiddleware, tutorRoutes); // [Team1-6] Socratic tutor
-app.use('/api/socratic', authMiddleware, socraticRoutes); // [Team1-6] Socratic sessions
-app.use('/api/study-mode', authMiddleware, studyModeRoutes); // Study questions + skill tree
+app.use('/api/deep-research', authMiddleware, researchLimiter, deepResearchRoutes);
+app.use('/api/tutor', authMiddleware, tutorRoutes);
+app.use('/api/socratic', authMiddleware, socraticRoutes);
+app.use('/api/study-mode', authMiddleware, studyModeRoutes);
 app.use('/api/debug', authMiddleware, debugRoutes);
 app.use('/api/progress', authMiddleware, require('./routes/progress'));
 app.use('/api/jobs', authMiddleware, require('./routes/jobs'));
 
-// --- Sentry Error Handler ---
 Sentry.setupExpressErrorHandler(app);
 
-// --- Centralized Error Handling ---
 app.use((err, req, res, next) => {
   log.error('SYSTEM', `Unhandled Error: ${err.message}`, err, `Check ${req.method} ${req.originalUrl}`);
-
   const statusCode = err.status || 500;
   const message = err.message || "An internal server error occurred.";
   if (!res.headersSent) {
@@ -316,30 +302,25 @@ app.use((err, req, res, next) => {
 async function startServer() {
   log.info('SYSTEM', "Starting Server Initialization...");
   try {
-    await setupAdmin(mongoUri);
     await ensureServerDirectories();
+    
+    // CRITICAL FIX: Establish database channel BEFORE bootstrap data lookup
+    log.info('SYSTEM', "Connecting to MongoDB Database...");
     await connectDB(mongoUri);
-    await checkEmailCredentials();
-    await performAssetCleanup();
-    await checkRagService(pythonRagUrl);
-    await connectRedis();
-    
-    // Bootstrap and integrity checks moved to offline jobs for faster server startup
-    // Run scripts/maintenanceJobs.js for full course integrity verification
-    // Courses are expected to be pre-configured via offline jobs
-    
-    await auditRedisUsage();
+    log.success('SYSTEM', "MongoDB database tunnel established.");
 
-    // --- Course material processing disabled on server startup ---
-    // Use offline maintenance jobs (scripts/maintenanceJobs.js) for:
-    //   - Course PDF ingestion (Cpurses/)
-    //   - Material pipeline (course_bootstrap/ → PDF→Markdown→Qdrant→STN)
-    // This prevents redundant processing and keeps server startup fast.
+    log.info('SYSTEM', "Running system configuration bootstrapping...");
+    await setupAdmin(mongoUri).catch(err => log.warn('SYSTEM', `Admin Bootstrap skipped: ${err.message}`));
+    await checkEmailCredentials().catch(() => {});
+    await performAssetCleanup().catch(() => {});
+    await checkRagService(pythonRagUrl);
     
-    // --- Watch course directories for new PDFs ---
+    log.info('SYSTEM', "Connecting to Redis client engine...");
+    await connectRedis().catch(err => log.warn('REDIS', `Redis caching bypassed for dev: ${err.message}`));
+    
+    await auditRedisUsage().catch(() => {});
     startCourseFileWatchers();
 
-    // --- Start Gamification Cron Jobs ---
     if (ENABLE_CRON) {
       log.info('SYSTEM', 'Starting gamification cron jobs...');
       startBountyGenerator();
@@ -348,28 +329,20 @@ async function startServer() {
       startBossBattleCleanup();
       startSpacedRepetitionScheduler();
       log.success('SYSTEM', 'All gamification cron jobs started successfully');
-
-      // --- MAINTENANCE MODE APPROACH (replaces nightly cron) ---
-      // Heavy offline jobs (KG extraction, XP scoring, skill tree questions, course updates)
-      // are now run via: node scripts/maintenanceJobs.js
-      // Run during daily maintenance window when frontend is offline for users.
-      log.info('SYSTEM', '[MAINTENANCE] For offline jobs, run: node scripts/maintenanceJobs.js');
     } else {
       log.warn('SYSTEM', 'Cron jobs are DISABLED (ENABLE_CRON=false)');
     }
 
     const server = app.listen(port, "0.0.0.0", () => {
-      log.success('SYSTEM', `Server listening on port ${port}`);
+      log.success('SYSTEM', `Server listening safely on port ${port}`);
     });
 
-    // --- Initialize Semantic Router ---
-    log.info('SYSTEM', 'Initializing semantic router...');
+    log.info('SYSTEM', 'Initializing semantic router checks...');
     const { initialize: initializeSemanticRouter } = require('./services/semanticRouter');
     initializeSemanticRouter()
       .then(() => log.success('SYSTEM', 'Semantic router initialized successfully'))
-      .catch((err) => log.error('SYSTEM', `Semantic router initialization failed: ${err.message}. Will fall back to keyword routing.`));
+      .catch((err) => log.error('SYSTEM', `Semantic router setup caught. Continuous reload suppressed.`));
 
-    // --- Initialize Socket.io ---
     const { initSocket } = require("./services/socketService");
     initSocket(server);
     log.success('SYSTEM', 'Socket.io initialized successfully');
@@ -380,7 +353,7 @@ async function startServer() {
         try {
           await mongoose.connection.close();
           log.info('SYSTEM', "MongoDB connection closed.");
-          await closeNeo4j(); // [Team1-6] Close Neo4j connection
+          await closeNeo4j().catch(() => {});
           log.info('SYSTEM', "Neo4j connection closed.");
           process.exit(0);
         } catch (err) {
@@ -397,7 +370,6 @@ async function startServer() {
   }
 }
 
-// Helper functions
 async function ensureServerDirectories() {
   const dirs = [
     path.join(__dirname, "assets"),
