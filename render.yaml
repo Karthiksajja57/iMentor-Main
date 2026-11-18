@@ -3,15 +3,15 @@ services:
     name: imentor-backend
     runtime: node
     rootDir: server
-    buildCommand: npm install
-    startCommand: npm start
+    buildCommand: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm install
+    startCommand: node server.js
     plan: free
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 5001
+      - key: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
+        value: "true"
       - key: JWT_SECRET
         generateValue: true
       - key: MONGO_URI
