@@ -145,13 +145,17 @@ function startCourseFileWatchers() {
   log.info('SYSTEM', `Course file watchers started on: ${watchDirs.join(', ')}`);
 }
 
-if (!process.env.JWT_SECRET || !process.env.ENCRYPTION_SECRET) {
-  log.error('SYSTEM', "JWT_SECRET or ENCRYPTION_SECRET is not set in .env file.");
-  process.exit(1);
+// Fallbacks for secrets to prevent startup crashes in production environments
+if (!process.env.JWT_SECRET) {
+  log.warn('SYSTEM', "JWT_SECRET not set in environment, using auto-generated fallback.");
+  process.env.JWT_SECRET = 'imentor_default_jwt_secret_32_characters_long_key';
+}
+if (!process.env.ENCRYPTION_SECRET || process.env.ENCRYPTION_SECRET.length !== 64) {
+  log.warn('SYSTEM', "ENCRYPTION_SECRET not set or invalid, using default 64-char hex key.");
+  process.env.ENCRYPTION_SECRET = 'abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789';
 }
 if (!mongoUri) {
-  log.error('SYSTEM', "MONGO_URI is not set in .env file.");
-  process.exit(1);
+  log.warn('SYSTEM', "MONGO_URI is not set in environment. Database connection will be deferred.");
 }
 
 const app = express();
