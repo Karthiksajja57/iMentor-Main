@@ -1,0 +1,8 @@
+node_modules
+dist
+.git
+android
+ios
+playwright-report
+test-results
+*.log
