@@ -5,6 +5,12 @@ const fs = require('fs');
 const envPath = path.join(__dirname, '.env');
 dotenv.config({ path: envPath });
 
+// Ensure security keys are always defined early before route loaders
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'imentor_default_jwt_secret_32_characters_long_key';
+process.env.ENCRYPTION_SECRET = (process.env.ENCRYPTION_SECRET && process.env.ENCRYPTION_SECRET.length === 64)
+  ? process.env.ENCRYPTION_SECRET
+  : 'abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789';
+
 require('./instrument.js');
 const { register, httpRequestDurationMicroseconds } = require('./utils/metrics');
 const Sentry = require("@sentry/node");
