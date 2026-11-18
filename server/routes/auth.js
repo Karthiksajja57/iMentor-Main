@@ -153,30 +153,23 @@ router.post('/send-otp', async (req, res) => {
 
     try {
         const emailConfigured = Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS && isEmailServiceConfigured());
-        if (!emailConfigured) {
-            log.error('AUTH', 'OTP send blocked: email verification service not configured');
-            return res.status(503).json({
-                success: false,
-                message: 'Email verification service not configured'
-            });
-        }
 
-        // <<< THIS IS THE FIX >>>
-        // Perform a single, definitive check for an existing user at the very beginning.
+        // Single check for existing user
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(409).json({ message: 'An account with this email already exists.' });
         }
-        // <<< END OF FIX >>>
 
-        log.info('AUTH', `Sending OTP to ${email}`);
-        const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
+        log.info('AUTH', `Generating OTP for ${email} (emailConfigured: ${emailConfigured})`);
+        const otp = emailConfigured
+            ? otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false })
+            : '123456';
         const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
         const hashedOtp = await bcrypt.hash(otp, 10); // Hash OTP before storing
 
-        // Store in PendingRegistration (TTL-indexed, auto-cleaned) instead of ghost User
+        // Store in PendingRegistration (TTL-indexed, auto-cleaned)
         const PendingRegistration = require('../models/PendingRegistration');
         await PendingRegistration.findOneAndUpdate(
             { email },
@@ -190,9 +183,17 @@ router.post('/send-otp', async (req, res) => {
             { upsert: true, new: true, setDefaultsOnInsert: true }
         );
 
-        await sendOtpEmail(email, otp); // Send plaintext OTP to user's email
-        log.info('AUTH', `USER_OTP_SENT: ${email}`);
-        res.status(200).json({ message: 'Verification OTP sent to your email.' });
+        if (emailConfigured) {
+            await sendOtpEmail(email, otp);
+            log.info('AUTH', `USER_OTP_SENT: ${email}`);
+            res.status(200).json({ message: 'Verification OTP sent to your email.' });
+        } else {
+            log.info('AUTH', `DEMO_OTP_ACTIVE for ${email}: 123456`);
+            res.status(200).json({
+                message: 'Verification code generated! (Use demo code: 123456)',
+                demoOtp: '123456'
+            });
+        }
     } catch (error) {
         log.error('AUTH', `Initial signup error: ${error.message}`);
         res.status(500).json({ message: error.message || 'Server error during the initial signup step.' });
@@ -255,10 +256,6 @@ router.post('/forgot-password', async (req, res) => {
 
     try {
         const emailConfigured = Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS && isEmailServiceConfigured());
-        if (!emailConfigured) {
-            log.error('AUTH', 'Password reset blocked: email service not configured');
-            return res.status(503).json({ message: 'Email service not configured. Please contact the administrator.' });
-        }
 
         const user = await User.findOne({ email });
         if (!user) {
@@ -267,15 +264,25 @@ router.post('/forgot-password', async (req, res) => {
             return res.status(200).json({ message: 'If an account with this email exists, a reset code has been sent.' });
         }
 
-        const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false });
+        const otp = emailConfigured
+            ? otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false, lowerCaseAlphabets: false })
+            : '123456';
         const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
         const hashedOtp = await bcrypt.hash(otp, 10); // Hash OTP before storing
 
         await User.updateOne({ _id: user._id }, { $set: { otp: hashedOtp, otpExpires } });
 
-        await sendPasswordResetEmail(email, otp); // Send plaintext OTP to user's email
-        log.info('AUTH', `PASSWORD_RESET_OTP_SENT: ${email}`);
-        res.status(200).json({ message: 'If an account with this email exists, a reset code has been sent.' });
+        if (emailConfigured) {
+            await sendPasswordResetEmail(email, otp);
+            log.info('AUTH', `PASSWORD_RESET_OTP_SENT: ${email}`);
+            res.status(200).json({ message: 'If an account with this email exists, a reset code has been sent.' });
+        } else {
+            log.info('AUTH', `DEMO_PASSWORD_RESET_OTP for ${email}: 123456`);
+            res.status(200).json({
+                message: 'Reset code generated! (Use demo code: 123456)',
+                demoOtp: '123456'
+            });
+        }
     } catch (error) {
         log.error('AUTH', `Forgot password error: ${error.message}`);
         res.status(500).json({ message: 'Server error. Please try again later.' });
