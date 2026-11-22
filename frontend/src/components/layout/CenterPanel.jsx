@@ -841,24 +841,29 @@ function CenterPanel({ messages, setMessages, currentSessionId, onChatProcessing
             {isResearchMode ? (
                 <DeepResearchPanel />
             ) : messages.length === 0 && !isActuallySendingAPI && currentSessionId ? (
-                <div className="flex-1 flex flex-col justify-center items-center p-4 sm:p-8 animate-fadeIn overflow-y-auto custom-scrollbar">
-                    <div data-tutor-tour="hero" className="w-full max-w-2xl mx-auto">
+                <div className="relative flex-1 flex flex-col justify-center items-center p-4 sm:p-8 animate-fadeIn overflow-y-auto custom-scrollbar">
+                    {/* Ambient Background Glow */}
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[520px] h-[280px] bg-gradient-to-tr from-indigo-500/15 via-purple-500/10 to-cyan-500/15 blur-[120px] rounded-full" />
+                    </div>
 
-                        {/* ── Wordmark ───────────────────────────────────── */}
+                    <div data-tutor-tour="hero" className="relative z-10 w-full max-w-2xl mx-auto">
+
+                        {/* ── Wordmark & Badge ─────────────────────────────── */}
                         <div className="mb-8 text-center">
+                            <Animate animation="fade-in" delay={100} className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/25 text-indigo-300 text-xs font-medium mb-4 shadow-sm backdrop-blur-md">
+                                <Sparkles size={13} className="text-indigo-400 animate-pulse" />
+                                <span>Next-Gen Autonomous AI Learning Platform</span>
+                            </Animate>
+
                             <Animate
                                 as="h2"
                                 animation="slide-up"
                                 delay={200}
-                                className="font-semibold tracking-tight mb-2"
-                                style={{
-                                    fontSize: '2rem',
-                                    color: 'var(--vs-text)',
-                                    letterSpacing: '-0.02em',
-                                }}
+                                className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-3 bg-gradient-to-r from-white via-indigo-100 to-indigo-300 bg-clip-text text-transparent"
                             >
                                 <TypewriterText
-                                    text={tutorMode ? "Socratic Mode" : "iMentor"}
+                                    text={tutorMode ? "Socratic Tutor" : "iMentor AI"}
                                     speed={55}
                                     delay={300}
                                 />
@@ -866,25 +871,26 @@ function CenterPanel({ messages, setMessages, currentSessionId, onChatProcessing
                             <Animate
                                 as="p"
                                 animation="fade-in"
-                                delay={1400}
-                                className="text-sm"
-                                style={{ color: 'var(--vs-text-dim)' }}
+                                delay={1200}
+                                className="text-sm sm:text-base max-w-lg mx-auto text-slate-400 leading-relaxed"
                             >
                                 <TypewriterText
                                     text={tutorMode
-                                        ? "Guided questioning — I teach by asking, not telling. What would you like to learn?"
-                                        : "AI-powered academic tutor. Ask anything about your studies."}
-                                    speed={30}
-                                    delay={1500}
+                                        ? "Guided questioning — I teach by asking, not telling. What would you like to master today?"
+                                        : "Your personal academic co-pilot. Ask anything about your coursework, concepts, or code."}
+                                    speed={25}
+                                    delay={1300}
                                 />
                             </Animate>
                         </div>
 
                         {/* ── Feature grid ──────────────────────────────── */}
-                        <Animate animation="fade-in" delay={1800}>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                        <Animate animation="fade-in" delay={1600}>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
                                 {features.map((feature) => {
                                     const Icon = feature.icon;
+                                    const isCyan = feature.title.includes('Skill');
+                                    const isBlue = feature.title.includes('Research');
                                     return (
                                         <div
                                             key={feature.title}
@@ -892,45 +898,24 @@ function CenterPanel({ messages, setMessages, currentSessionId, onChatProcessing
                                         >
                                             <button
                                                 onClick={() => handleFeatureClick(feature)}
-                                                className="group text-left p-3.5 rounded-md transition-all duration-150 outline-none focus-visible:ring-1 focus-visible:ring-[--vs-border-hi] w-full"
-                                                style={{
-                                                    background:   'var(--vs-sidebar)',
-                                                    border:       '1px solid var(--vs-border)',
-                                                    borderRadius: '6px',
-                                                    boxShadow:    '0 2px 8px rgba(0,0,0,0.25), 0 1px 2px rgba(0,0,0,0.15)',
-                                                }}
-                                                onMouseEnter={e => {
-                                                    e.currentTarget.style.background    = 'var(--vs-surface)';
-                                                    e.currentTarget.style.borderColor   = 'var(--vs-border-hi)';
-                                                    e.currentTarget.style.boxShadow     = '0 4px 16px rgba(0,0,0,0.35), 0 2px 4px rgba(0,0,0,0.2)';
-                                                    e.currentTarget.style.transform     = 'translateY(-1px)';
-                                                }}
-                                                onMouseLeave={e => {
-                                                    e.currentTarget.style.background    = 'var(--vs-sidebar)';
-                                                    e.currentTarget.style.borderColor   = 'var(--vs-border)';
-                                                    e.currentTarget.style.boxShadow     = '0 2px 8px rgba(0,0,0,0.25), 0 1px 2px rgba(0,0,0,0.15)';
-                                                    e.currentTarget.style.transform     = 'translateY(0)';
-                                                }}
+                                                className="group text-left p-4 rounded-xl transition-all duration-200 outline-none w-full bg-slate-900/60 hover:bg-slate-800/80 border border-slate-700/50 hover:border-indigo-500/50 shadow-lg hover:shadow-indigo-500/10 hover:-translate-y-0.5 backdrop-blur-md"
                                                 aria-label={feature.title}
                                             >
-                                                <div className="flex items-start gap-2.5">
-                                                    <div
-                                                        className="mt-0.5 flex-shrink-0"
-                                                        style={{ color: 'var(--vs-text-lo)' }}
-                                                    >
-                                                        <Icon size={14} />
+                                                <div className="flex items-start gap-3">
+                                                    <div className={`p-2 rounded-lg border transition-colors ${
+                                                        isCyan 
+                                                            ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400 group-hover:bg-cyan-500/20' 
+                                                            : isBlue 
+                                                                ? 'bg-blue-500/10 border-blue-500/20 text-blue-400 group-hover:bg-blue-500/20'
+                                                                : 'bg-purple-500/10 border-purple-500/20 text-purple-400 group-hover:bg-purple-500/20'
+                                                    }`}>
+                                                        <Icon size={16} />
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <div
-                                                            className="text-xs font-bold mb-0.5 truncate"
-                                                            style={{ color: '#ffffff' }}
-                                                        >
+                                                        <div className="text-sm font-semibold text-white group-hover:text-indigo-200 transition-colors mb-1 truncate">
                                                             {feature.title}
                                                         </div>
-                                                        <div
-                                                            className="text-xs leading-snug line-clamp-2"
-                                                            style={{ color: 'var(--vs-text-dim)' }}
-                                                        >
+                                                        <div className="text-xs text-slate-400 leading-snug line-clamp-2">
                                                             {feature.description}
                                                         </div>
                                                     </div>
@@ -939,6 +924,24 @@ function CenterPanel({ messages, setMessages, currentSessionId, onChatProcessing
                                         </div>
                                     );
                                 })}
+                            </div>
+
+                            {/* ── Starter Prompts ────────────────────────── */}
+                            <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+                                {[
+                                    "Explain Transformer Architecture",
+                                    "Guide me through Calculus Derivatives",
+                                    "Binary Search Tree vs Hash Table",
+                                    "How does Backpropagation work?"
+                                ].map((promptText) => (
+                                    <button
+                                        key={promptText}
+                                        onClick={() => handleSendMessage(promptText)}
+                                        className="text-xs px-3.5 py-1.5 rounded-full bg-slate-800/60 hover:bg-indigo-600/20 border border-slate-700/60 hover:border-indigo-500/40 text-slate-300 hover:text-indigo-200 transition-all shadow-sm hover:scale-102"
+                                    >
+                                        💡 {promptText}
+                                    </button>
+                                ))}
                             </div>
                         </Animate>
 

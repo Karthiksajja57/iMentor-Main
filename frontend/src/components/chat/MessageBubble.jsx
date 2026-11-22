@@ -342,9 +342,9 @@ function MessageBubble({ sender, text, thinking, references, timestamp, sourcePi
                     </div>
                 )}
 
-                <div className={`message-bubble relative px-4 py-2.5 rounded-lg break-words ${isUser
-                    ? 'bg-white/10 text-white border border-white/20 shadow-[0_2px_8px_rgba(0,0,0,0.3)]'
-                    : 'bg-[#1a1a1a] text-white border border-[#4a4a4a] shadow-[0_2px_12px_rgba(0,0,0,0.4)]'
+                <div className={`message-bubble relative px-5 py-3.5 break-words transition-all duration-200 ${isUser
+                    ? 'bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white rounded-2xl rounded-tr-sm shadow-lg shadow-indigo-950/40 border border-indigo-400/30'
+                    : 'bg-[#0f172a]/95 text-slate-100 border border-slate-700/60 rounded-2xl rounded-tl-sm shadow-xl shadow-black/30 backdrop-blur-md'
                     }`}>
 
                     {/* Status Badge (like Tutor Mode) — only visible while streaming */}
@@ -453,23 +453,23 @@ function MessageBubble({ sender, text, thinking, references, timestamp, sourcePi
                         )}
 
                         {!isUser && !activeIsStreaming && (
-                            <div className="flex items-center gap-1.5 text-text-muted-light dark:text-text-muted-dark">
+                            <div className="flex items-center gap-1 text-slate-400">
                                 {/* Copy */}
                                 <button
                                     onClick={handleCopy}
                                     title={isCopied ? 'Copied!' : 'Copy'}
                                     disabled={isCopied}
-                                    className="p-1 hover:text-black dark:hover:text-white transition-colors"
+                                    className="p-1.5 rounded-lg hover:bg-white/10 hover:text-white transition-colors"
                                 >
-                                    {isCopied ? <Check size={14} /> : <Copy size={14} />}
+                                    {isCopied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
                                 </button>
 
                                 {/* Feedback */}
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-0.5">
                                     <button
                                         onClick={() => handleFeedback('positive')}
                                         disabled={!!feedbackSent}
-                                        className={`p-1 hover:text-black dark:hover:text-white transition-colors ${feedbackSent === 'positive' ? 'text-green-500' : ''}`}
+                                        className={`p-1.5 rounded-lg hover:bg-white/10 hover:text-white transition-colors ${feedbackSent === 'positive' ? 'text-emerald-400 bg-emerald-500/15' : ''}`}
                                         title="Good response"
                                     >
                                         <ThumbsUp size={14} />
@@ -477,7 +477,7 @@ function MessageBubble({ sender, text, thinking, references, timestamp, sourcePi
                                     <button
                                         onClick={() => handleFeedback('negative')}
                                         disabled={!!feedbackSent}
-                                        className={`p-1 hover:text-black dark:hover:text-white transition-colors ${feedbackSent === 'negative' ? 'text-red-500' : ''}`}
+                                        className={`p-1.5 rounded-lg hover:bg-white/10 hover:text-white transition-colors ${feedbackSent === 'negative' ? 'text-rose-400 bg-rose-500/15' : ''}`}
                                         title="Bad response"
                                     >
                                         <ThumbsDown size={14} />

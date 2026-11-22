@@ -18,52 +18,53 @@
    * ───────────────────────────────────────────────────────────────────────── */
 
   :root {
-    /* Shell backgrounds — richer surfaces for executive look */
-    --vs-bg:          #121212;   /* editor / main canvas          */
-    --vs-sidebar:     #1a1a1a;   /* sidebar, left/right panels    */
-    --vs-panel:       #1e1e1e;   /* activity bar, terminal bg     */
-    --vs-surface:     #242424;   /* card / raised surface         */
-    --vs-surface-hi:  #2e2e2e;   /* hover state on surface        */
+    /* Shell backgrounds — modern luxury AI dark palette */
+    --vs-bg:          #090d16;   /* main background — obsidian with deep navy glow */
+    --vs-sidebar:     #0d1322;   /* sidebar / side panels                          */
+    --vs-panel:       #12192d;   /* top bar, cards, terminal bg                    */
+    --vs-surface:     #172038;   /* raised surface / modals                        */
+    --vs-surface-hi:  #202c4c;   /* hover state on surface                         */
 
-    /* Borders — sharper edges for executive look */
-    --vs-border-lo:   #383838;   /* hairline dividers             */
-    --vs-border:      #4a4a4a;   /* default border                */
-    --vs-border-hi:   #666666;   /* focused / active border       */
+    /* Borders — crisp hairline glass with subtle luminance */
+    --vs-border-lo:   rgba(255, 255, 255, 0.08);   /* hairline dividers   */
+    --vs-border:      rgba(255, 255, 255, 0.14);   /* default border      */
+    --vs-border-hi:   rgba(99, 102, 241, 0.55);    /* focused accent glow */
 
-    /* Text — full-white for maximum brightness & readability */
-    --vs-text:        #ffffff;   /* primary text — full white      */
-    --vs-text-lo:     #b0b0b0;   /* secondary / muted             */
-    --vs-text-dim:    #777777;   /* placeholders, disabled        */
-    --vs-text-inv:    #0d0d0d;   /* text on light surfaces        */
+    /* Text */
+    --vs-text:        #f8fafc;   /* crisp white text */
+    --vs-text-lo:     #94a3b8;   /* muted secondary  */
+    --vs-text-dim:    #64748b;   /* placeholders     */
+    --vs-text-inv:    #0f172a;   /* text on light    */
 
-    /* Interactive */
-    --vs-hover:       rgba(255,255,255,0.08);
-    --vs-active:      rgba(255,255,255,0.14);
-    --vs-focus-ring:  rgba(255,255,255,0.22);
+    /* Interactive & Accents */
+    --vs-hover:       rgba(99, 102, 241, 0.12);
+    --vs-active:      rgba(99, 102, 241, 0.22);
+    --vs-focus-ring:  rgba(99, 102, 241, 0.50);
+    --vs-accent:      #6366f1;   /* electric indigo  */
+    --vs-accent-cyan: #06b6d4;   /* cyber cyan       */
+    --vs-accent-purple: #a855f7; /* neon violet      */
 
-    /* Code block background (separate from shell) */
-    --vs-code-bg:     #282c34;
-    --vs-code-text:   #abb2bf;
+    /* Code block background */
+    --vs-code-bg:     #0d1220;
+    --vs-code-text:   #e2e8f0;
 
-    /* Font scale — JS writes user preference to --font-base on <html>
-     * --vp-scale then multiplies it so the result is appropriate for the
-     * screen size without requiring any JS media-query listeners. */
-    --font-base: 17px;
-    --vp-scale:  1;      /* desktop default — 17 × 1.0 = 17px */
+    /* Font scale */
+    --font-base: 16px;
+    --vp-scale:  1;
 
-    /* Legacy: keep vscode-* vars for backward compat with existing components */
+    /* Backward compatibility */
     --vscode-bg:          var(--vs-bg);
     --vscode-sidebar:     var(--vs-sidebar);
     --vscode-panel:       var(--vs-panel);
-    --vscode-selection:   #264f78;
+    --vscode-selection:   rgba(99, 102, 241, 0.35);
     --vscode-border:      var(--vs-border);
-    --vscode-blue:        #569cd6;
-    --vscode-cyan:        #4ec9b0;
-    --vscode-green:       #6a9955;
-    --vscode-orange:      #ce9178;
-    --vscode-purple:      #c586c0;
-    --vscode-yellow:      #dcdcaa;
-    --vscode-red:         #f48771;
+    --vscode-blue:        #60a5fa;
+    --vscode-cyan:        #22d3ee;
+    --vscode-green:       #34d399;
+    --vscode-orange:      #fb923c;
+    --vscode-purple:      #c084fc;
+    --vscode-yellow:      #fde047;
+    --vscode-red:         #f87171;
     --vscode-text:        var(--vs-text);
     --vscode-text-muted:  var(--vs-text-lo);
   }

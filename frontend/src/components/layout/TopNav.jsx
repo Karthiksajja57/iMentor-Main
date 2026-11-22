@@ -261,28 +261,31 @@ function TopNav({
         <>
             {/* ── Nav bar ─────────────────────────────────────────────────── */}
             <nav
-                className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-3 sm:px-5 h-11"
+                className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-3 sm:px-6 h-12 backdrop-blur-md"
                 style={{
-                    background:   'var(--vs-sidebar)',
-                    borderBottom: '1px solid var(--vs-border)',
-                    boxShadow:    '0 1px 0 rgba(0,0,0,0.3)',
+                    background:   'rgba(13, 19, 34, 0.85)',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                    boxShadow:    '0 4px 20px rgba(0, 0, 0, 0.35)',
                 }}
             >
                 {/* Logo */}
                 <Link
                     to="/"
-                    className="flex items-center gap-2 flex-shrink-0"
+                    className="flex items-center gap-2.5 flex-shrink-0 group"
                     style={{ textDecoration: 'none' }}
                 >
-                    <Server
-                        size={16}
-                        style={{ color: 'var(--vs-text-lo)' }}
-                    />
+                    <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-tr from-indigo-500 via-purple-500 to-cyan-400 p-0.5 shadow-md shadow-indigo-500/30 group-hover:shadow-indigo-500/50 transition-all duration-300">
+                        <div className="w-full h-full bg-[#0d1322] rounded-[6px] flex items-center justify-center">
+                            <Sparkles size={13} className="text-cyan-400" />
+                        </div>
+                    </div>
                     <span
-                        className="hidden sm:inline text-sm font-semibold tracking-tight"
-                        style={{ color: 'var(--vs-text)', letterSpacing: '-0.01em' }}
+                        className="hidden sm:inline text-base font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-200 bg-clip-text text-transparent"
                     >
                         iMentor
+                    </span>
+                    <span className="hidden md:inline px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/25">
+                        AI
                     </span>
                 </Link>
 

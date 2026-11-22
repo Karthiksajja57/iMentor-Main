@@ -222,21 +222,21 @@ function ChatInput({
                 selectedSource={selectedDocumentForAnalysis}
             />
 
-            {/* VS Code terminal-style input container */}
+            {/* Modern floating input capsule */}
             <Animate
                 data-tutor-tour="chat-input"
-                className="relative flex items-end gap-2"
+                className="relative flex items-end gap-2 backdrop-blur-xl"
                 style={{
-                    background:   'var(--vs-panel)',
+                    background:   'rgba(18, 25, 45, 0.85)',
                     border:       isFocused
-                        ? '1px solid var(--vs-border-hi)'
-                        : '1px solid var(--vs-border)',
-                    borderRadius: '6px',
-                    transition:   'border-color 0.15s, box-shadow 0.15s',
-                    padding:      '8px 10px',
+                        ? '1px solid rgba(99, 102, 241, 0.65)'
+                        : '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '16px',
+                    transition:   'border-color 0.2s, box-shadow 0.2s',
+                    padding:      '10px 14px',
                     boxShadow:    isFocused
-                        ? '0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06)'
-                        : '0 2px 8px rgba(0,0,0,0.3)',
+                        ? '0 12px 32px -4px rgba(99, 102, 241, 0.25), 0 0 0 1px rgba(99, 102, 241, 0.3)'
+                        : '0 8px 24px -4px rgba(0,0,0,0.45)',
                 }}
                 animation="fade-in"
             >
@@ -248,11 +248,11 @@ function ChatInput({
                         title="More options"
                         aria-label="More options"
                         style={{
-                            padding:      '5px',
-                            borderRadius: '3px',
-                            background:   isMenuOpen ? 'var(--vs-active)' : 'transparent',
-                            border:       '1px solid transparent',
-                            color:        isMenuOpen ? 'var(--vs-text)' : 'var(--vs-text-dim)',
+                            padding:      '7px',
+                            borderRadius: '10px',
+                            background:   isMenuOpen ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                            border:       '1px solid rgba(255, 255, 255, 0.08)',
+                            color:        isMenuOpen ? '#818cf8' : 'var(--vs-text-dim)',
                             cursor:       'pointer',
                             transition:   'color 0.15s, background 0.15s',
                             flexShrink:   0,
@@ -503,17 +503,17 @@ function ChatInput({
                             key="stop-button"
                             type="button"
                             onClick={onStop}
-                            className="flex items-center justify-center"
+                            className="flex items-center justify-center transition-all hover:scale-105 active:scale-95"
                             title="Stop generating"
                             style={{
-                                padding: '6px', borderRadius: '3px',
-                                background: 'var(--vs-surface)',
-                                border: '1px solid var(--vs-border-hi)',
-                                color: 'var(--vs-text-lo)',
+                                padding: '8px', borderRadius: '10px',
+                                background: 'rgba(239, 68, 68, 0.2)',
+                                border: '1px solid rgba(239, 68, 68, 0.4)',
+                                color: '#f87171',
                                 cursor: 'pointer',
                             }}
                         >
-                            <div style={{ width:'10px', height:'10px', background:'var(--vs-text-lo)', borderRadius:'1px' }} />
+                            <Square size={13} fill="#f87171" />
                         </button>
                     ) : (
                         <button
@@ -522,13 +522,14 @@ function ChatInput({
                             onClick={handleSubmit}
                             disabled={!inputValue.trim()}
                             title="Send message (Enter)"
+                            className={`flex items-center justify-center transition-all ${
+                                inputValue.trim() 
+                                    ? 'hover:scale-105 active:scale-95 bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30'
+                                    : 'bg-white/5 text-slate-500 cursor-not-allowed border border-white/5'
+                            }`}
                             style={{
-                                padding: '6px', borderRadius: '3px',
-                                background: inputValue.trim() ? 'var(--vs-text)' : 'var(--vs-surface)',
-                                border: '1px solid transparent',
-                                color: inputValue.trim() ? 'var(--vs-text-inv)' : 'var(--vs-text-dim)',
-                                cursor: inputValue.trim() ? 'pointer' : 'not-allowed',
-                                transition: 'background 0.15s, color 0.15s',
+                                padding: '8px 10px',
+                                borderRadius: '10px',
                             }}
                         >
                             <Send size={15} />

@@ -107,7 +107,7 @@ const Modal = ({
             <div
                 ref={modalRef}
                 tabIndex={-1}
-                className={`bg-surface-light dark:bg-surface-dark rounded-lg shadow-xl w-full ${sizeClasses[size]} flex flex-col overflow-hidden
+                className={`bg-[#0f172a]/95 backdrop-blur-2xl border border-indigo-500/25 rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] w-full ${sizeClasses[size]} flex flex-col overflow-hidden
                             ${size === 'full' ? '' : 'max-h-[90vh] sm:max-h-[85vh]'}
                             transition-all duration-300 ease-out
                             ${visible ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-[0.98] -translate-y-4'}`}
@@ -117,32 +117,29 @@ const Modal = ({
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Modal Header */}
-                <div className="flex items-center justify-between px-5 py-3.5 border-b border-border-light dark:border-border-dark sticky top-0 bg-surface-light dark:bg-surface-dark z-10 flex-shrink-0">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700/60 sticky top-0 bg-[#0f172a]/95 backdrop-blur-md z-10 flex-shrink-0">
                     {title && (
-                        <h2 id="modal-title-text" className="text-lg font-semibold text-text-light dark:text-text-dark truncate pr-4">
+                        <h2 id="modal-title-text" className="text-lg font-bold text-white tracking-tight truncate pr-4">
                             {title}
                         </h2>
                     )}
                     <button
                         onClick={onClose}
-                        className="p-1.5 rounded-full text-text-muted-light dark:text-text-muted-dark 
-                                   hover:bg-gray-200/80 dark:hover:bg-gray-700/80 
-                                   hover:text-red-500 dark:hover:text-red-400 
-                                   focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary-light focus:ring-offset-1 dark:focus:ring-offset-surface-dark"
+                        className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors focus:outline-none"
                         aria-label="Close modal"
                     >
-                        <X size={20} />
+                        <X size={18} />
                     </button>
                 </div>
 
                 {/* Modal Body */}
-                <div className="px-5 py-4 overflow-y-auto flex-grow custom-scrollbar">
+                <div className="px-6 py-5 overflow-y-auto flex-grow custom-scrollbar">
                     {children}
                 </div>
 
-                        {/* Modal Footer */}
+                {/* Modal Footer */}
                 {footerContent && (
-                    <div className="px-5 py-3.5 border-t border-border-light dark:border-border-dark flex justify-end gap-3 sticky bottom-0 bg-surface-light dark:bg-surface-dark z-10 flex-shrink-0">
+                    <div className="px-6 py-4 border-t border-slate-700/60 flex justify-end gap-3 sticky bottom-0 bg-[#0f172a]/95 backdrop-blur-md z-10 flex-shrink-0">
                         {footerContent}
                     </div>
                 )}

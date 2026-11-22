@@ -92,16 +92,18 @@ function LeftPanel({ isChatProcessing, currentSessionId, handleSelectSessionFrom
             </div>
 
             {/* Admin Subjects — opens dedicated Course Explorer page */}
-            <div className="mb-4">
+            <div className="mb-3">
                 <button
                     onClick={() => navigate('/courses')}
-                    className={`w-full flex items-center gap-2 px-4 py-3 text-sm font-medium text-left transition-all duration-200 rounded-xl shadow-sm border ${
+                    className={`w-full flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium text-left transition-all duration-200 rounded-xl shadow-sm border ${
                         location.pathname === '/courses'
-                            ? 'bg-indigo-500/10 border-indigo-500/40 text-indigo-300 ring-1 ring-indigo-500/20'
-                            : 'bg-gray-50 dark:bg-gray-800 border-border-light dark:border-border-dark text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700'
+                            ? 'bg-indigo-500/15 border-indigo-500/40 text-indigo-300 ring-1 ring-indigo-500/20 shadow-indigo-500/10'
+                            : 'bg-slate-900/50 border-slate-800/80 text-slate-200 hover:bg-slate-800/60 hover:border-slate-700'
                     }`}
                 >
-                    <Library size={16} className={location.pathname === '/courses' ? 'text-indigo-400' : 'text-primary dark:text-primary-light'} />
+                    <div className="p-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+                        <Library size={15} />
+                    </div>
                     <span className="flex-1">Courses</span>
                     {selectedSubject && location.pathname !== '/courses' && (
                         <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full font-medium truncate max-w-[80px]">
@@ -109,13 +111,13 @@ function LeftPanel({ isChatProcessing, currentSessionId, handleSelectSessionFrom
                         </span>
                     )}
                     {location.pathname === '/courses' && (
-                        <BookMarked size={13} className="text-indigo-400" />
+                        <BookMarked size={14} className="text-indigo-400" />
                     )}
                 </button>
             </div>
 
             {/* Tutor Mode (Selectable Option) */}
-            <div className="mb-4">
+            <div className="mb-3">
                 <button
                     onClick={() => {
                         if (location.pathname === '/tutor') {
@@ -125,44 +127,53 @@ function LeftPanel({ isChatProcessing, currentSessionId, handleSelectSessionFrom
                             toast.success("🎓 Tutor Mode activated!");
                         }
                     }}
-                    className={`w-full flex items-center gap-2 px-4 py-3 text-sm font-medium text-left transition-all duration-200 rounded-xl shadow-sm border ${tutorMode
-                        ? 'bg-primary/10 border-primary text-primary dark:text-primary-light ring-1 ring-primary/20'
-                        : 'bg-gray-50 dark:bg-gray-800 border-border-light dark:border-border-dark text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700'
+                    className={`w-full flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium text-left transition-all duration-200 rounded-xl shadow-sm border ${tutorMode
+                        ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 ring-1 ring-emerald-500/20 shadow-emerald-500/10'
+                        : 'bg-slate-900/50 border-slate-800/80 text-slate-200 hover:bg-slate-800/60 hover:border-slate-700'
                         }`}
                 >
-                    <GraduationCap size={16} className={tutorMode ? 'text-primary' : 'text-primary dark:text-primary-light'} />
+                    <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                        <GraduationCap size={15} />
+                    </div>
                     <span className="flex-1">Tutor Mode</span>
                     {tutorMode && (
                         <Animate
                             animation="scale-in"
-                            className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_theme(colors.primary.DEFAULT)]"
+                            className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"
                         />
                     )}
                 </button>
             </div>
 
             {/* Deep Research Mode — desktop only, hidden on mobile */}
-            <div className="hidden md:block mb-4">
+            <div className="hidden md:block mb-3">
                 <button
                     onClick={() => {
                         navigate('/tools/deep-research');
                     }}
-                    className={`w-full flex items-center gap-2 px-4 py-3 text-sm font-medium text-left transition-all duration-200 rounded-xl shadow-sm border bg-gray-50 dark:bg-gray-800 border-border-light dark:border-border-dark text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-700`}
+                    className={`w-full flex items-center gap-2.5 px-3.5 py-3 text-sm font-medium text-left transition-all duration-200 rounded-xl shadow-sm border bg-slate-900/50 border-slate-800/80 text-slate-200 hover:bg-slate-800/60 hover:border-slate-700`}
                 >
-                    <Zap size={16} className="text-blue-500" />
+                    <div className="p-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+                        <Zap size={15} />
+                    </div>
                     <span className="flex-1">Deep Research</span>
                 </button>
             </div>
 
             {/* Chat History Section */}
-            <div className="mb-4">
+            <div className="mb-3">
                 <button
                     onClick={toggleHistorySection}
-                    className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-left text-text-light dark:text-text-dark bg-gray-50 dark:bg-gray-800 border border-border-light dark:border-border-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl focus:outline-none shadow-sm transition-all duration-200"
+                    className="w-full flex items-center justify-between px-3.5 py-3 text-sm font-medium text-left text-slate-200 bg-slate-900/50 border border-slate-800/80 hover:bg-slate-800/60 hover:border-slate-700 rounded-xl focus:outline-none shadow-sm transition-all duration-200"
                     aria-expanded={isHistorySectionOpen}
                 >
-                    <span className="flex items-center gap-2"><History size={16} className="text-primary dark:text-primary-light" /> Chat History</span>
-                    {isHistorySectionOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                    <span className="flex items-center gap-2.5">
+                        <div className="p-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+                            <History size={15} />
+                        </div>
+                        Chat History
+                    </span>
+                    {isHistorySectionOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </button>
                 <Animate
                     show={isHistorySectionOpen}
@@ -227,17 +238,19 @@ function LeftPanel({ isChatProcessing, currentSessionId, handleSelectSessionFrom
             </div>
 
             {/* User's Knowledge Base Section (Embedded Accordion) */}
-            <div className="mb-4">
+            <div className="mb-3">
                 <button
                     onClick={() => setIsKBSectionOpen(prev => !prev)}
-                    className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-left text-text-light dark:text-text-dark bg-gray-50 dark:bg-gray-800 border border-border-light dark:border-border-dark hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl focus:outline-none shadow-sm transition-all duration-200"
+                    className="w-full flex items-center justify-between px-3.5 py-3 text-sm font-medium text-left text-slate-200 bg-slate-900/50 border border-slate-800/80 hover:bg-slate-800/60 hover:border-slate-700 rounded-xl focus:outline-none shadow-sm transition-all duration-200"
                     aria-expanded={isKBSectionOpen}
                 >
-                    <span className="flex items-center gap-2">
-                        <FilePlus size={16} className="text-primary dark:text-primary-light" /> 
+                    <span className="flex items-center gap-2.5">
+                        <div className="p-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400">
+                            <FilePlus size={15} />
+                        </div>
                         My Knowledge Base
                     </span>
-                    {isKBSectionOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                    {isKBSectionOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </button>
                 <Animate
                     show={isKBSectionOpen}

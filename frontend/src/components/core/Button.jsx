@@ -16,16 +16,16 @@ const Button = ({
     className = '',
     ...props
 }) => {
-    const baseStyles = "font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-75 transition-all duration-150 ease-in-out flex items-center justify-center gap-2";
+    const baseStyles = "font-semibold rounded-xl focus:outline-none transition-all duration-150 ease-in-out flex items-center justify-center gap-2";
 
     const variantStyles = {
-        primary: "bg-primary hover:bg-primary-dark text-white focus:ring-primary",
-        secondary: "bg-secondary hover:bg-secondary-dark text-white focus:ring-secondary",
-        danger: "bg-red-500 hover:bg-red-600 text-white focus:ring-red-500",
-        outline: "border border-primary text-primary hover:bg-primary-light dark:hover:bg-opacity-10 focus:ring-primary",
-        ghost: "text-primary hover:bg-primary-light dark:hover:bg-opacity-10 focus:ring-primary",
-        monochrome: "bg-black hover:bg-gray-800 text-white focus:ring-black",
-        'monochrome-outline': "border-2 border-black text-black hover:bg-gray-100 focus:ring-black",
+        primary: "bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 hover:opacity-95 text-white shadow-md shadow-indigo-500/25 active:scale-98",
+        secondary: "bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/80 active:scale-98",
+        danger: "bg-red-500 hover:bg-red-600 text-white focus:ring-red-500 active:scale-98",
+        outline: "border border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/10 active:scale-98",
+        ghost: "text-slate-300 hover:text-white hover:bg-white/10 active:scale-98",
+        monochrome: "bg-white hover:bg-slate-100 text-black shadow-md active:scale-98",
+        'monochrome-outline': "border border-white/20 text-white hover:bg-white/10 active:scale-98",
     };
 
     const sizeStyles = {
