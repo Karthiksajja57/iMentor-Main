@@ -19,10 +19,10 @@ export const AppStateProvider = ({ children }) => {
 
     const [selectedLLM, setSelectedLLM] = useState(() => {
         const stored = localStorage.getItem('selectedLLM');
-        // Migrate legacy 'ollama' → 'local_llm'
-        if (stored === 'ollama' || stored === 'groq' || !stored) {
-            localStorage.setItem('selectedLLM', 'local_llm');
-            return 'local_llm';
+        // Default to cloud Gemini for reliable live service
+        if (stored === 'ollama' || stored === 'local_llm' || !stored) {
+            localStorage.setItem('selectedLLM', 'gemini');
+            return 'gemini';
         }
         return stored;
     });

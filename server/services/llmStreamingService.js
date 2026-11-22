@@ -80,7 +80,17 @@ async function streamCompletion({
         } else if (provider === 'groq') {
             result = await streamGroq({ messages, model, apiKey, systemPrompt, onToken: finalOnToken, options });
         } else if (provider === 'ollama') {
-            result = await streamOllama({ messages, model, systemPrompt, onToken: finalOnToken, options });
+            try {
+                result = await streamOllama({ messages, model, systemPrompt, onToken: finalOnToken, options });
+            } catch (ollamaErr) {
+                if (process.env.GEMINI_API_KEY) {
+                    log.warn('AI', `Ollama stream failed (${ollamaErr.message}); falling back to Gemini`);
+                    result = await streamGemini({ messages, model: 'gemini-flash-lite-latest', apiKey: process.env.GEMINI_API_KEY, systemPrompt, onToken: finalOnToken, options });
+                } else {
+                    throw ollamaErr;
+                }
+            }
+        }
         } else if (provider === 'sglang') {
             result = await streamSGLang({ messages, model, systemPrompt, onToken: finalOnToken, options });
         } else {

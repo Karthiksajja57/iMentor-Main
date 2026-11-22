@@ -375,23 +375,28 @@ async function selectLLM(query, context) {
     }
   }
 
-  // No fallback — use exactly the user's chosen provider. Fail clearly if unavailable.
-  const catalogModel = catalogFind({ provider: preferredProvider })
-      || await LLMConfiguration.findOne({ provider: preferredProvider }).then(m => m?.toObject?.() || m);
+  // If chosen provider is ollama but ollama is offline, gracefully fall back to Gemini
+  let finalProvider = preferredProvider;
+  if ((finalProvider === 'ollama' || finalProvider === 'local_llm') && !isOllamaActuallyUp && process.env.GEMINI_API_KEY) {
+    finalProvider = 'gemini';
+  }
+
+  const catalogModel = catalogFind({ provider: finalProvider })
+      || await LLMConfiguration.findOne({ provider: finalProvider }).then(m => m?.toObject?.() || m);
   if (catalogModel) {
     return {
       chosenModel: { ...catalogModel, workingUrl: workingOllamaUrl },
-      logic: `catalog_strict_${preferredProvider}`,
+      logic: `catalog_${finalProvider}`,
       classification
     };
   }
 
-  const defaultModelId = (SGLANG_ENABLED || preferredProvider === 'ollama' || preferredProvider === 'local_llm')
+  const defaultModelId = (SGLANG_ENABLED || finalProvider === 'ollama' || finalProvider === 'local_llm')
     ? (process.env.SGLANG_CHAT_MODEL || 'Qwen/Qwen2.5-7B-Instruct-AWQ')
-    : (process.env.GEMINI_MODEL || 'gemini-2.0-flash');
+    : (process.env.GEMINI_MODEL || 'gemini-flash-lite-latest');
 
   return {
-    chosenModel: { modelId: defaultModelId, provider: SGLANG_ENABLED ? 'sglang' : preferredProvider, workingUrl: workingOllamaUrl },
+    chosenModel: { modelId: defaultModelId, provider: SGLANG_ENABLED ? 'sglang' : finalProvider, workingUrl: workingOllamaUrl },
     logic: 'strict_hardcoded_default',
     classification
   };

@@ -245,12 +245,12 @@ function AuthModal({ isOpen, onClose, initialViewIsLogin }) {
             try {
                 const finalSignupData = { 
                     ...formData, 
-                    preferredLlmProvider: 'local_llm',  // Backend expects this field name
+                    preferredLlmProvider: 'gemini',
                     otp 
                 };
                 console.log('[SIGNUP DEBUG] Sending:', JSON.stringify(finalSignupData, null, 2));
                 const authDataResponse = await signup(finalSignupData);
-                setGlobalLLM('local_llm');
+                setGlobalLLM('gemini');
                 toast.success(authDataResponse.message || 'Signup Successful!', { id: toastId });
                 onClose(authDataResponse);
             } catch (err) {

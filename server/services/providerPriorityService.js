@@ -60,19 +60,23 @@ async function resolveProviderByPreference({
         }
     }
 
-    // No silent fallback — user gets what they chose or an error
     const availability = {
         ollama: ollamaAvailable,
         gemini: !SGLANG_ENABLED && Boolean(process.env.GEMINI_API_KEY || (preferred === 'gemini' && userApiKey)),
     };
 
-    // Only the preferred provider — no fallback to others
+    // If preferred is ollama but ollama is offline, gracefully fall back to Gemini
+    let chosen = preferred;
+    if (preferred === 'ollama' && !ollamaAvailable && availability.gemini) {
+        chosen = 'gemini';
+    }
+
     return {
-        chosenProvider: preferred,
-        chain: [preferred],
+        chosenProvider: chosen,
+        chain: [chosen],
         availability,
         workingOllamaUrl,
-        apiKey: getApiKeyForProvider(preferred, preferredProvider, userApiKey),
+        apiKey: getApiKeyForProvider(chosen, chosen, userApiKey),
     };
 }
 
