@@ -78,6 +78,12 @@ function getModelId() {
 async function fetchModelCapabilities() {
     if (_fetchPromise) return _fetchPromise;
 
+    if (process.env.SGLANG_ENABLED !== 'true') {
+        _fetched = true;
+        _fetchPromise = Promise.resolve(_maxContextTokens);
+        return _fetchPromise;
+    }
+
     _fetchPromise = (async () => {
         const url = `${_baseUrl()}/v1/models`;
 

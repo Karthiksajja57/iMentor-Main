@@ -3,7 +3,7 @@ const log = require('../utils/logger');
 const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require('@google/generative-ai');
 
 const SECONDARY_API_KEY = process.env.GEMINI_API_KEY;
-const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-flash-lite-latest";
 
 const DEFAULT_MAX_OUTPUT_TOKENS_CHAT = 8192;
 const DEFAULT_MAX_OUTPUT_TOKENS_KG = 8192;

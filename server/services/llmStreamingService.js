@@ -106,52 +106,69 @@ async function streamCompletion({
 async function streamGemini({ messages, model, apiKey, systemPrompt, onToken, options }) {
     const genAI = new GoogleGenerativeAI(apiKey);
 
-    // Format model name
-    let modelName = model || process.env.GEMINI_MODEL || 'gemini-2.0-flash';
-    if (modelName && !modelName.startsWith('models/')) {
-        modelName = `models/${modelName}`;
-    }
+    const candidateModels = [
+        model,
+        process.env.GEMINI_MODEL,
+        'gemini-flash-lite-latest',
+        'gemini-flash-latest',
+        'gemini-pro-latest'
+    ].filter(Boolean);
 
-    const generativeModel = genAI.getGenerativeModel({
-        model: modelName,
-        systemInstruction: systemPrompt ? { parts: [{ text: systemPrompt }] } : undefined,
-    });
+    const uniqueModels = [...new Set(candidateModels)];
+    let lastError = null;
 
-    // Format history: Gemini expects { role: 'user'|'model', parts: [{ text: '...' }] }
-    // We assume the last message is the current query, and the rest is history
-    const history = messages.slice(0, -1).map(msg => ({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }]
-    }));
+    for (const rawModel of uniqueModels) {
+        let modelName = rawModel;
+        if (modelName.includes('gemini-2.0-flash')) {
+            modelName = 'gemini-flash-lite-latest';
+        }
+        if (!modelName.startsWith('models/')) {
+            modelName = `models/${modelName}`;
+        }
 
-    const currentQuery = messages[messages.length - 1].content;
+        try {
+            const generativeModel = genAI.getGenerativeModel({
+                model: modelName,
+                systemInstruction: systemPrompt ? { parts: [{ text: systemPrompt }] } : undefined,
+            });
 
-    const chat = generativeModel.startChat({
-        history: history,
-        generationConfig: {
-            temperature: options.temperature || 0.7,
-            maxOutputTokens: options.maxOutputTokens || 4096,
-        },
-    });
+            const history = messages.slice(0, -1).map(msg => ({
+                role: msg.role === 'assistant' ? 'model' : 'user',
+                parts: [{ text: msg.content }]
+            }));
 
-    const result = await chat.sendMessageStream(currentQuery);
+            const currentQuery = messages[messages.length - 1].content;
 
-    let fullText = '';
-    // log.info('AI', `Starting Gemini stream...`);
-    for await (const chunk of result.stream) {
-        const chunkText = chunk.text();
-        if (chunkText) {
-            fullText += chunkText;
-            if (options.handleThinkingTags) {
-                onToken(chunkText);
-            } else {
-                onToken({ type: 'token', content: chunkText });
+            const chat = generativeModel.startChat({
+                history: history,
+                generationConfig: {
+                    temperature: options.temperature || 0.7,
+                    maxOutputTokens: options.maxOutputTokens || 4096,
+                },
+            });
+
+            const result = await chat.sendMessageStream(currentQuery);
+
+            let fullText = '';
+            for await (const chunk of result.stream) {
+                const chunkText = chunk.text();
+                if (chunkText) {
+                    fullText += chunkText;
+                    if (options.handleThinkingTags) {
+                        onToken(chunkText);
+                    } else {
+                        onToken({ type: 'token', content: chunkText });
+                    }
+                }
             }
+            return fullText;
+        } catch (err) {
+            log.warn('AI', `Gemini stream attempt failed on ${modelName}: ${err.message}. Cascading to next candidate...`);
+            lastError = err;
         }
     }
-    // log.success('AI', `Gemini stream complete (${fullText.length} chars)`);
 
-    return fullText;
+    throw lastError || new Error('All Gemini candidate models failed.');
 }
 
 /**

@@ -137,7 +137,7 @@ const PROVIDERS = {
     SGLANG_HEAVY:    { provider: 'sglang_heavy', model: process.env.SGLANG_HEAVY_MODEL   || 'Qwen/Qwen2.5-7B-Instruct-AWQ', shift: 'both',  active: process.env.SGLANG_ENABLED === 'true' },
     SGLANG_TUTOR:    { provider: 'sglang_chat',  model: process.env.SGLANG_CHAT_MODEL    || 'Qwen/Qwen2.5-7B-Instruct-AWQ', shift: 'day',   active: process.env.SGLANG_ENABLED === 'true' },
     // ── Fallback: Gemini when SGLang unreachable ──
-    GEMINI_FLASH:    { provider: 'gemini',     model: process.env.GEMINI_MODEL         || 'gemini-2.0-flash', shift: 'day', active: !!process.env.GEMINI_API_KEY },
+    GEMINI_FLASH:    { provider: 'gemini',     model: process.env.GEMINI_MODEL         || 'gemini-flash-lite-latest', shift: 'day', active: !!process.env.GEMINI_API_KEY },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
