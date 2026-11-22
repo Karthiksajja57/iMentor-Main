@@ -242,7 +242,7 @@ router.post('/signin', async (req, res) => {
         });
     } catch (error) {
         log.error('AUTH', `Signin error: ${error.message}`);
-        res.status(500).json({ message: 'Server error during signin.' });
+        res.status(500).json({ message: error.message || 'Server error during signin.' });
     }
 });
 

@@ -1,5 +1,13 @@
 const mongoose = require('mongoose');
+const dns = require('dns');
 const log = require('../utils/logger');
+
+// Configure reliable DNS servers to guarantee SRV lookups on cloud/Windows
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch (e) {
+  // Ignore in sandboxed runtimes
+}
 
 // Modified connectDB to accept the URI as an argument with retry logic
 const connectDB = async (mongoUri) => {
@@ -19,3 +27,4 @@ const connectDB = async (mongoUri) => {
 };
 
 module.exports = connectDB;
+

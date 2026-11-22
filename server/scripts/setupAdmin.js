@@ -65,7 +65,9 @@ async function setupAdmin(mongoUri) {
     const adminPassword = process.env.FIXED_ADMIN_PASSWORD || 'admin123';
 
     try {
-        await mongoose.connect(mongoUri);
+        if (mongoose.connection.readyState === 0) {
+            await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 8000 });
+        }
         // log.info('SYSTEM', 'MongoDB connected for admin check');
 
         const stripResult = await User.updateMany(
@@ -102,9 +104,10 @@ async function setupAdmin(mongoUri) {
     } catch (error) {
         log.error('SYSTEM', 'Admin setup error', error);
     } finally {
-        rl.close();
-        await mongoose.disconnect();
-        // log.info('SYSTEM', 'Admin setup connection closed');
+        if (require.main === module) {
+            rl.close();
+            await mongoose.disconnect();
+        }
     }
 }
 
